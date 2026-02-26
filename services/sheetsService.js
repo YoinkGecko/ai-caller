@@ -68,6 +68,7 @@ async function updateRow(rowIndex, values) {
 }
 
 module.exports = {
+  getAllRows,
   getAllPendingLeads,
   findRowByCallSid,
   updateRow

@@ -27,9 +27,30 @@ app.get('/health', (req, res) => {
 
 // Status endpoint
 app.get('/status', async (req, res) => {
-  const { getAllPendingLeads } = require('./services/sheetsService')
-  const pending = await getAllPendingLeads()
-  res.json({ pendingCount: pending.length })
+  const { getAllRows } = require('./services/sheetsService')
+
+  const rows = await getAllRows()
+
+  let pending = 0
+  let calling = 0
+  let processed = 0
+  let failed = 0
+
+  rows.forEach(r => {
+    const state = r[3]
+    if (state === 'pending' || !state) pending++
+    else if (state === 'calling') calling++
+    else if (state === 'processed') processed++
+    else if (state === 'failed') failed++
+  })
+
+  res.json({
+    total: rows.length,
+    pending,
+    calling,
+    processed,
+    failed
+  })
 })
 
 // Root route serves frontend

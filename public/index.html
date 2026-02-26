@@ -1,71 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Caller Dashboard</title>
+  <title>AI Caller Control Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
       font-family: system-ui;
-      max-width: 600px;
-      margin: 60px auto;
+      background: #f9fafb;
+      max-width: 900px;
+      margin: 40px auto;
       padding: 20px;
     }
-    .card {
-      border: 1px solid #eee;
-      padding: 20px;
-      border-radius: 8px;
+
+    h1 {
       margin-bottom: 20px;
     }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .number {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
     button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 15px;
       cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
     }
-    pre {
-      background: #f5f5f5;
+
+    button:hover {
+      background: #1e40af;
+    }
+
+    .log {
+      background: #111827;
+      color: #f9fafb;
       padding: 15px;
-      overflow-x: auto;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: monospace;
+      max-height: 200px;
+      overflow-y: auto;
     }
   </style>
 </head>
 <body>
 
-  <h1>AI Caller Workflow</h1>
+  <h1>AI Caller Workflow Dashboard</h1>
 
-  <div class="card">
-    <strong>Pending Leads:</strong>
-    <span id="pending">Loading...</span>
+  <div class="grid">
+    <div class="card">
+      Total Leads
+      <div class="number" id="total">0</div>
+    </div>
+
+    <div class="card">
+      Pending
+      <div class="number" id="pending">0</div>
+    </div>
+
+    <div class="card">
+      Calling
+      <div class="number" id="calling">0</div>
+    </div>
+
+    <div class="card">
+      Processed
+      <div class="number" id="processed">0</div>
+    </div>
+
+    <div class="card">
+      Failed
+      <div class="number" id="failed">0</div>
+    </div>
   </div>
 
-  <div class="card">
-    <button onclick="start()">Start Calling</button>
-  </div>
+  <button onclick="start()">Start Calling</button>
 
-  <div class="card">
-    <strong>Response:</strong>
-    <pre id="output">No actions yet.</pre>
-  </div>
+  <div class="log" id="log">System ready.</div>
 
   <script>
-    async function loadStatus() {
+    async function fetchStatus() {
       const res = await fetch('/status')
       const data = await res.json()
-      document.getElementById('pending').innerText = data.pendingCount
+
+      document.getElementById('total').innerText = data.total
+      document.getElementById('pending').innerText = data.pending
+      document.getElementById('calling').innerText = data.calling
+      document.getElementById('processed').innerText = data.processed
+      document.getElementById('failed').innerText = data.failed
     }
 
     async function start() {
-      document.getElementById('output').innerText = "Starting..."
-
+      log("Starting workflow...")
       const res = await fetch('/start-call', { method: 'POST' })
       const data = await res.json()
-
-      document.getElementById('output').innerText =
-        JSON.stringify(data, null, 2)
-
-      loadStatus()
+      log(JSON.stringify(data))
+      fetchStatus()
     }
 
-    loadStatus()
+    function log(message) {
+      const el = document.getElementById('log')
+      el.innerText += "\n" + message
+      el.scrollTop = el.scrollHeight
+    }
+
+    setInterval(fetchStatus, 4000)
+    fetchStatus()
   </script>
 
 </body>
