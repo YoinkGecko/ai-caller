@@ -10,7 +10,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/YoinkGecko/ai-caller.git"
-  
   },
   "keywords": [],
   "author": "",
@@ -22,6 +21,7 @@
   "dependencies": {
     "axios": "^1.13.5",
     "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "googleapis": "^171.4.0",
