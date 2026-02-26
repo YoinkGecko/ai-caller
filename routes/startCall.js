@@ -1,48 +1,53 @@
 const express = require('express')
 const router = express.Router()
 
-const { getPendingLead, updateRow } = require('../services/sheetsService')
+const { getAllPendingLeads, updateRow } = require('../services/sheetsService')
 const { makeCall } = require('../services/callService')
 
 router.post('/', async (req, res) => {
   try {
-    const lead = await getPendingLead()
+    const pendingLeads = await getAllPendingLeads()
 
-    if (!lead) {
-      return res.json({ message: "No pending leads" })
+    if (pendingLeads.length === 0) {
+      return res.json({ message: "No pending leads found" })
     }
 
+    const results = []
+
+    
+
+   for (const lead of pendingLeads) {
+  try {
     const [id, name, phone] = lead.row
 
-    // Update state to calling
+    if (!phone) continue
+
     await updateRow(lead.rowIndex, [
-      id,
-      name,
-      phone,
-      'calling',
-      '',
-      '',
-      ''
+      id, name, phone, 'calling', '', '', ''
     ])
 
     const callSid = await makeCall(phone)
 
-    // Save callSid
     await updateRow(lead.rowIndex, [
-      id,
-      name,
-      phone,
-      'calling',
-      '',
-      '',
-      callSid
+      id, name, phone, 'calling', '', '', callSid
     ])
 
-    res.json({ message: "Call initiated", callSid })
+    results.push({ id, phone, callSid })
 
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: "Failed to start call" })
+    console.error("Call failed for row:", lead.rowIndex, err.message)
+  }
+}
+
+    res.json({
+      message: "Calls initiated",
+      total: results.length,
+      calls: results
+    })
+
+  } catch (err) {
+    console.error("Start-call error:", err)
+    res.status(500).json({ error: "Failed to process leads" })
   }
 })
 

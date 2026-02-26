@@ -25,20 +25,22 @@ async function getAllRows() {
   return res.data.values || []
 }
 
-async function getPendingLead() {
+async function getAllPendingLeads() {
   const rows = await getAllRows()
+  const pending = []
 
   for (let i = 0; i < rows.length; i++) {
     const callState = rows[i][3]
+
     if (!callState || callState === 'pending') {
-      return {
+      pending.push({
         rowIndex: i + 2,
         row: rows[i]
-      }
+      })
     }
   }
 
-  return null
+  return pending
 }
 
 async function findRowByCallSid(callSid) {
@@ -68,7 +70,8 @@ async function updateRow(rowIndex, values) {
 }
 
 module.exports = {
-  getPendingLead,
+  getAllRows,
+  getAllPendingLeads,
   findRowByCallSid,
   updateRow
 }
