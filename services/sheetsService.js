@@ -21,7 +21,6 @@ async function getAllRows() {
     spreadsheetId: process.env.GOOGLE_SHEET_ID,
     range: `${SHEET_NAME}!A2:G`
   })
-
   return res.data.values || []
 }
 
@@ -31,7 +30,6 @@ async function getAllPendingLeads() {
 
   for (let i = 0; i < rows.length; i++) {
     const callState = rows[i][3]
-
     if (!callState || callState === 'pending') {
       pending.push({
         rowIndex: i + 2,
@@ -70,7 +68,6 @@ async function updateRow(rowIndex, values) {
 }
 
 module.exports = {
-  getAllRows,
   getAllPendingLeads,
   findRowByCallSid,
   updateRow

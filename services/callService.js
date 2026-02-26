@@ -11,7 +11,7 @@ async function makeCall(phone) {
     to: phone,
     from: process.env.TWILIO_PHONE,
     statusCallback: `${process.env.BASE_URL}/call-status`,
-    statusCallbackEvent: ['completed'],
+    statusCallbackEvent: ['initiated', 'answered', 'completed'],
     record: true
   })
 

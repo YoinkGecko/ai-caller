@@ -12,42 +12,39 @@ router.post('/', async (req, res) => {
       return res.json({ message: "No pending leads found" })
     }
 
-    const results = []
-
-    
-
-   for (const lead of pendingLeads) {
-  try {
+    const lead = pendingLeads[0]
     const [id, name, phone] = lead.row
 
-    if (!phone) continue
-
     await updateRow(lead.rowIndex, [
-      id, name, phone, 'calling', '', '', ''
+      id,
+      name,
+      phone,
+      'calling',
+      '',
+      '',
+      ''
     ])
 
     const callSid = await makeCall(phone)
 
     await updateRow(lead.rowIndex, [
-      id, name, phone, 'calling', '', '', callSid
+      id,
+      name,
+      phone,
+      'calling',
+      '',
+      '',
+      callSid
     ])
 
-    results.push({ id, phone, callSid })
-
-  } catch (err) {
-    console.error("Call failed for row:", lead.rowIndex, err.message)
-  }
-}
-
     res.json({
-      message: "Calls initiated",
-      total: results.length,
-      calls: results
+      message: "First call initiated",
+      callSid
     })
 
   } catch (err) {
     console.error("Start-call error:", err)
-    res.status(500).json({ error: "Failed to process leads" })
+    res.status(500).json({ error: "Failed to start call" })
   }
 })
 
